@@ -1,0 +1,296 @@
+components:
+  schemas:
+    User:
+      type: object
+      properties:
+        id:
+          type: string
+        email:
+          type: string
+          format: email
+        firstname:
+          type: string
+        lastname:
+          type: string
+        role:
+          type: string
+          enum: [USER, ADMIN]
+      example:
+        id: 5ebac534954b54139806c112
+        email: user@gmail.com
+        firstname: fake fist name
+        lastname: fake last name
+        role: STUDENT | LECTURER | ADMIN
+
+    Token:
+      type: object
+      properties:
+        token:
+          type: string
+        expires:
+          type: string
+          format: date-time
+      example:
+        token: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiI1ZWJhYzUzNDk1NGI1NDEzOTgwNmMxMTIiLCJpYXQiOjE1ODkyOTg0ODQsImV4cCI6MTU4OTMwMDI4NH0.m1U63blB0MLej_WfB7yC2FTMnCziif9X8yzwDEfJXAg
+        expires: 2020-05-12T16:18:04.793Z
+
+    AuthTokens:
+      type: object
+      properties:
+        access:
+          $ref: '#/components/schemas/Token'
+        refresh:
+          $ref: '#/components/schemas/Token'
+    Lecturer:
+      type: object
+      properties:
+        id:
+          type: integer
+          example: 3
+        userId:
+          type: integer
+          example: 6
+        staffId:
+          type: string
+          example: 'LT859025'
+        user:
+          $ref: '#/components/schemas/User'
+    Student:
+      type: object
+      properties:
+        id:
+          type: integer
+          example: 3
+        userId:
+          type: integer
+          example: 6
+        studentId:
+          type: string
+          example: 'ST859025'
+        user:
+          $ref: '#/components/schemas/User'
+    AssignmentDraft:
+      type: object
+      required:
+        - title
+        - description
+        - deadline
+      properties:
+        title:
+          type: string
+          example: 'Assignment 1'
+        description:
+          type: string
+          description: |
+            A brief description of the field using **Markdown** syntax.
+
+            You can use **bold**, *italic*, [links](https://example.com),
+            and other Markdown formatting options here.
+        deadline:
+          type: string
+          format: date-time
+          example: '2021-01-01T00:00:00Z'
+    EditableAssignement:
+      type: object
+      properties:
+        title:
+          type: string
+          example: 'Assignment 1'
+        description:
+          type: string
+          description: |
+            A brief description of the field using **Markdown** syntax.
+
+            You can use **bold**, *italic*, [links](https://example.com),
+            and other Markdown formatting options here.
+        deadline:
+          type: string
+          format: date-time
+          example: '2021-01-01T00:00:00Z'
+
+    Assignment:
+      type: object
+      properties:
+        id:
+          type: integer
+          example: 1
+        title:
+          type: string
+          example: 'Assignment 1'
+        description:
+          type: string
+          description: |
+            A brief description of the field using **Markdown** syntax.
+
+            You can use **bold**, *italic*, [links](https://example.com),
+            and other Markdown formatting options here.
+        deadline:
+          type: string
+          format: date-time
+          example: '2021-01-01T00:00:00Z'
+        lecturer:
+          $ref: '#/components/schemas/Lecturer'
+        isDraft:
+          type: boolean
+          example: false
+        created_at:
+          type: string
+          format: date-time
+          example: '2021-01-01T00:00:00Z'
+        updated_at:
+          type: string
+          format: date-time
+          example: '2021-01-01T00:00:00Z'
+    Snapshot:
+      type: array
+      items:
+        type: object
+        properties:
+          snapshotName:
+            type: string
+            example: 'snapshot1'
+    Submission:
+      type: object
+      properties:
+        id:
+          type: integer
+          example: 1
+        assignmentId:
+          type: integer
+          example: 1
+        studentId:
+          type: integer
+          example: 1
+        student:
+          type: object
+          properties:
+            id:
+              type: integer
+              example: 1
+            studentCode:
+              type: string
+              example: ST123030
+            user:
+              type: object
+              properties:
+                id:
+                  type: number
+                email:
+                  type: string
+                  format: email
+                firstname:
+                  type: string
+                lastname:
+                  type: string
+        assignment:
+          type: object
+          properties:
+            id:
+              type: integer
+              example: 3
+            assignmentCode:
+              type: string
+              example: ASS123030
+        snapshots:
+          type: array
+          items:
+            $ref: '#/components/schemas/Snapshot'
+        created_at:
+          type: string
+          format: date-time
+          example: '2021-01-01T00:00:00Z'
+        updated_at:
+          type: string
+          format: date-time
+          example: '2021-01-01T00:00:00Z'
+        latestSnapshot:
+          $ref: '#/components/schemas/LatestSnaphot'
+              
+    LatestSnaphot:
+      type: array
+      items:
+        type: object
+        properties:
+          name:
+            type: string
+            example: 'index.js'
+          type:
+            type: string
+            example: 'file'
+          contents?: 
+            type: array
+            items:
+              type: object
+              properties:
+                name:
+                  type: string
+                  example: 'src'
+                type:
+                  type: string
+                  example: 'folder'           
+    StudentId:
+      type: object
+      properties:
+        studentIds:
+          type: array
+          studentIds:
+            type: integer
+          example: [1, 2, 3, 4]
+    Error:
+      type: object
+      properties:
+        code:
+          type: number
+        message:
+          type: string
+
+  responses:
+    ValidationError:
+      description: Error validating request
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/Error'
+
+    Unauthorized:
+      description: Unauthorized
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/Error'
+          example:
+            code: 401
+            message: Please authenticate
+    Forbidden:
+      description: Forbidden
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/Error'
+          example:
+            code: 403
+            message: Forbidden
+    NotFound:
+      description: Not found
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/Error'
+          example:
+            code: 404
+            message: Not found
+    BadRequest:
+      description: Bad request
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/Error'
+          example:
+            code: 400
+            message: Bad request
+            
+  securitySchemes:
+    bearerAuth:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT

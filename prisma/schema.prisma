@@ -1,0 +1,90 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "mongodb"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  id               String          @id @default(auto()) @map("_id") @db.ObjectId
+  email            String          @unique
+  firstname        String?
+  lastname         String?
+  password         String
+  isInviteAccepted Boolean         @default(false)
+  createdAt        DateTime        @default(now())
+  updatedAt        DateTime        @updatedAt
+  Token            Token[]
+  transactions     Transactions[]
+}
+
+model Token {
+  id          String     @id @default(auto()) @map("_id") @db.ObjectId
+  token       String     @unique
+  type        TokenType
+  expires     DateTime
+  blacklisted Boolean
+  createdAt   DateTime   @default(now())
+  user        User       @relation(fields: [userId], references: [id], onDelete: Cascade)
+  userId      String     @db.ObjectId
+}
+
+model Account {
+  id             String          @id @default(auto()) @map("_id") @db.ObjectId
+  accountType    accountType     @default(CASH) 
+  Amount         Int
+  transactions   Transactions[]
+}
+
+model Budget {
+  id       String  @id @default(auto()) @map("_id") @db.ObjectId
+  amaunt   Int
+  period   String
+  categoryId String @db.ObjectId
+  category Category @relation(fields: [categoryId],references: [id])
+}
+
+model Category {
+  id             String          @id @default(auto()) @map("_id") @db.ObjectId
+  name           String
+  subcategories  SubCategory[]
+  budgets Budget[]
+}
+
+model SubCategory {
+  id          String      @id @default(auto()) @map("_id") @db.ObjectId
+  name        String
+  categoryId  String      @db.ObjectId
+  category    Category    @relation(fields: [categoryId], references: [id])
+}
+
+model Transactions {
+  id          String      @id @default(auto()) @map("_id") @db.ObjectId
+  amount      Float
+  item        String
+  type        TransactionTypes
+  date        DateTime
+  accountId   String      @db.ObjectId
+  userId      String      @db.ObjectId
+  user        User        @relation(fields: [userId], references: [id], onDelete: Cascade)
+  account     Account     @relation(fields: [accountId], references: [id], onDelete: Cascade)
+}
+
+enum TokenType {
+  ACCESS
+  REFRESH
+  ACTIVATION
+}
+
+enum TransactionTypes {
+  Income
+  Expense
+}
+
+enum accountType {
+  MOMO
+  BANK
+  CASH
+}

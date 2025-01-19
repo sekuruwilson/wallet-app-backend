@@ -1,0 +1,181 @@
+tags:
+  - name: Submission
+    description: Submission Management
+
+paths: 
+  /api/submission:
+    get:
+      summary: Get all submissions
+      tags:
+        - Submission
+      security:
+        - bearerAuth: []
+      responses:  
+        '200': 
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Submission'
+        '400':
+          $ref: '#/components/responses/ValidationError'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '404':
+          $ref: '#/components/responses/NotFound'
+  
+  /api/submission/{assignmentCode}:
+    post:
+      summary: Create Submission
+      tags: 
+      - Submission
+      security:
+        - bearerAuth: []
+      parameters:
+        - in: path
+          name: assignmentCode
+          schema:
+            type: string
+          required: true
+          description: Assignment Code
+      requestBody:
+        required: true
+        content:
+          multipart/form-data:
+            schema:
+              type: object
+              properties:
+                head:
+                  type: string
+                  required: true
+                  format: binary
+                  description: Head of Submission
+                
+      responses:
+        '201':
+          description: Created
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    example: Submission created successfully 
+                  data:
+                    $ref: '#/components/schemas/Submission'    
+        '400':
+          $ref: '#/components/responses/ValidationError'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '404':          
+          $ref: '#/components/responses/NotFound'
+ 
+  /api/submission/{submissionCode}:
+    get:
+      summary: Get submission with submissionCode
+      tags:
+        - Submission
+      security:
+        - bearerAuth: []
+      parameters:
+        - in: path
+          name: submissionCode
+          schema:
+            type: string
+          required: true
+          description: Submission Code
+      responses:
+        '200': 
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Submission'
+        '400':
+          $ref: '#/components/responses/ValidationError'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '404':
+          $ref: '#/components/responses/NotFound'  
+    patch:
+      summary: Update submission with submissionCode
+      tags:
+        - Submission
+      security:
+        - bearerAuth: []
+      parameters:
+        - in: path
+          name: submissionCode
+          schema:
+            type: string
+          required: true
+          description: Submission Code
+      requestBody:
+        required: true
+        content:
+          multipart/form-data:
+            schema:
+              type: object
+              properties:
+                head:
+                  type: string
+                  format: binary
+                  description: Head of Submission              
+      responses:
+        '200': 
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Submission'
+        '400':
+          $ref: '#/components/responses/ValidationError'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '404':
+          $ref: '#/components/responses/NotFound'
+
+  /api/submission/{submissionCode}/snapshots/download:
+    get:
+      summary: Download snapshots of submission with submissionCode
+      tags:
+        - Submission
+      security:
+        - bearerAuth: []
+      parameters:
+        - in: path
+          name: submissionCode
+          schema:
+            type: string
+          required: true
+          description: Submission Code
+      responses:
+        '200':
+          description: OK. 
+          content:
+            application/octet-stream:
+              schema:
+                type: string
+                format: binary
+        '400':
+          $ref: '#/components/responses/ValidationError'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '404':
+          $ref: '#/components/responses/NotFound'
+

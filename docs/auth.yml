@@ -1,0 +1,189 @@
+tags:
+  name: Auth
+  description: Authentication
+
+/api/auth/login:
+  post:
+    summary: Login
+    tags: [Auth]
+    requestBody:
+      required: true
+      content:
+        application/json:
+          schema:
+            type: object
+            required:
+              - username
+              - password
+            properties:
+              username:
+                type: string
+                description: email or staff id
+              password:
+                type: string
+                format: password
+            example:
+              username: username@gmail.com
+              password: Password1! 
+
+    responses:
+      '200':
+        description: OK
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                user:
+                  $ref: '#/components/schemas/User'
+                tokens:
+                  $ref: '#/components/schemas/AuthTokens'
+      '401':
+        description: Invalid email or password
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Error'
+            example:
+              code: 401
+              message: Invalid email or password
+
+/api/auth/refresh-tokens:
+  post:
+    summary: Refresh auth tokens
+    tags: [Auth]
+    requestBody:
+      required: true
+      content:
+        application/json:
+          schema:
+            type: object
+            required:
+              - refreshToken
+            properties:
+              refreshToken:
+                type: string
+            example:
+              refreshToken: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiI1ZWJhYzUzNDk1NGI1NDEzOTgwNmMxMTIiLCJpYXQiOjE1ODkyOTg0ODQsImV4cCI6MTU4OTMwMDI4NH0.m1U63blB0MLej_WfB7yC2FTMnCziif9X8yzwDEfJXAg
+    responses:
+      '200':
+        description: OK
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/AuthTokens'
+      '401':
+        $ref: '#/components/responses/Unauthorized'
+
+/api/auth/logout:
+  post:
+    summary: Logout
+    tags: [Auth]
+    security:
+      - bearerAuth: []
+    requestBody:
+      required: true
+      content:
+        application/json:
+          schema:
+            type: object
+            required:
+              - refreshToken
+            properties:
+              refreshToken:
+                type: string
+            example:
+              refreshToken: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOjEsImlhdCI6MTY4NDMxOTU3NSwiZXhwIjoxNjg2OTExNTc1LCJ0eXBlIjoiUkVGUkVTSCJ9.v5Btor0c57USA_E5z-0WolYTEIsxj5zUnIK_Hi4HsHQ
+    responses:
+      '200':
+        description: OK
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Error'
+            example:
+              code: 200
+              message: Logged out successfully
+
+      '401':
+        description: Not found
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Error'
+            example:
+              code: 401
+              message: Please authenticate
+
+/api/auth/reset-password:
+  patch:
+    summary: Reset password
+    tags: [Auth]
+    security:
+      - bearerAuth: []
+    requestBody:
+      required: true
+      content:
+        application/json:
+          schema:
+            type: object
+            required:
+              - newPassword
+            properties:
+              newPassword:
+                type: string
+            example:
+              newPassword: password1
+    responses:
+      '200':
+        description: OK
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Error'
+            example:
+              code: 200
+              message: Password reset successfully
+
+      '401':
+        description: Unauthorized
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Error'
+            example:
+              code: 401
+              message: Please authenticate
+
+/api/auth/activate/{activationToken}:
+  post:
+    summary: Activate account
+    tags: [Auth]
+    parameters:
+      - in: path
+        name: activationToken
+        schema:
+          type: string
+        required: true
+        description: Activation Token
+    responses:
+      '200':
+        description: Account activated successfully
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Error'
+            example:
+              code: 200
+              message: Account activated successfully
+
+      '404':
+        description: Not found
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Error'
+            example:
+              code: 404
+              message: Not found
+

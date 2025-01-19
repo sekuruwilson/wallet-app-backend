@@ -1,0 +1,235 @@
+tags:
+  name: Lecturer
+  description: Lecturer Management
+
+/api/lecturer:
+  get:
+    summary: Get all lecturers
+    tags: [Lecturer]
+    security:
+      - bearerAuth: []
+    responses:
+      '200':
+        description: OK
+        content:
+          application/json:
+            schema:
+              type: array
+              items:
+                $ref: '#/components/schemas/Lecturer'
+      '401':
+        description:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Error'
+            example:
+              code: 401
+              message: Please authenticate
+  post:
+    summary: Create a new lecturer
+    tags: [Lecturer]
+    security:
+      - bearerAuth: []
+    requestBody:
+      required: true
+      content:
+        application/json:
+          schema:
+            type: object
+            required:
+              - firstname
+              - lastname
+              - email
+            properties:
+              firstname:
+                type: string
+              lastname:
+                type: string
+              email:
+                type: string
+                format: email
+            example:
+              firstname: yohana
+              lastname: doe
+              email: yohana@amalitech.org
+    responses:
+      '201':
+        description: CREATED
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                id:
+                  type: integer
+                  example: 3
+                userId:
+                  type: integer
+                  example: 6
+                lecturerId:
+                  type: string
+                  example: 'LC859025'
+                user:
+                  $ref: '#/components/schemas/User'
+      '400':
+        description:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Error'
+            example:
+              code: 400
+              message: Email already exists
+      '401':
+        description:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Error'
+            example:
+              code: 401
+              message: Please authenticate
+
+/api/lecturer/{staffId}:
+  get:
+    summary: Get a lecturer
+    tags: [Lecturer]
+    security:
+      - bearerAuth: []
+    parameters:
+      - in: path
+        name: staffId
+        schema:
+          type: string
+        required: true
+        description: Staff ID
+    responses:
+      '200':
+        description: OK
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Lecturer'
+      '401':
+        description:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Error'
+            example:
+              code: 401
+              message: Please authenticate
+  put:
+    summary: Update a lecturer
+    tags: [Lecturer]
+    security:
+      - bearerAuth: []
+    parameters:
+      - in: path
+        name: staffId
+        schema:
+          type: string
+        required: true
+        description: Staff ID
+    requestBody:
+      required: true
+      content:
+        application/json:
+          schema:
+            type: object
+            required:
+              - firstname
+              - lastname
+              - email
+            properties:
+              firstname:
+                type: string
+              lastname:
+                type: string
+              email:
+                type: string
+                format: email
+            example:
+              firstname: yohana
+              lastname: doe
+              email: john@gmail.com
+    responses:
+      '204':
+        description: No Content
+      '400':
+        description:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Error'
+            example:
+              code: 400
+              message: Email already exists
+      '401':
+        description:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Error'
+            example:
+              code: 401
+              message: Please authenticate
+
+/api/lecturer/{userId}:  
+  delete:
+    summary: Delete a lecturer
+    tags: [Lecturer]
+    security:
+      - bearerAuth: []
+    parameters:
+      - in: path
+        name: userId
+        schema:
+          type: number
+        required: true
+        description: User ID
+    responses:
+      '204':
+        description: No Content
+      '401':
+        description:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Error'
+            example:
+              code: 401
+              message: Please authenticate
+
+/api/lecturer/csv:
+  post:
+    summary: Upload a CSV file of lecturers
+    tags: [Lecturer]
+    security:
+      - bearerAuth: []
+    requestBody:
+      required: true
+      content:
+        multipart/form-data:
+          schema:
+            type: object
+            properties:
+              lecturers:
+                type: string
+                format: binary
+    responses:
+      '201':
+        description: CREATED
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                message:
+                  type: string
+                  example: Students uploaded successfully
+      '400':
+        description: Bad Request
+      '401':
+        description: Unauthorized
